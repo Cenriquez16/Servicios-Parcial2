@@ -1,0 +1,31 @@
+Vagrant.configure("2") do |config|
+if Vagrant.has_plugin? "vagrant-vbguest"
+config.vbguest.no_install = true
+config.vbguest.auto_update = false
+config.vbguest.no_remote = true
+end
+config.vm.define :server1 do |server1|
+server1.vm.box = "bento/centos-7"
+server1.vm.network :private_network, ip: "192.168.50.2"
+server1.vm.network :forwarded_port,guest: 443,host: 5568
+server1.vm.network :forwarded_port,guest: 80,host: 5567
+server1.vm.hostname = "server1"
+end
+config.vm.define :server2 do |server2|
+server2.vm.box = "bento/centos-7"
+server2.vm.network :private_network, ip: "192.168.50.3"
+server2.vm.hostname = "server2"
+end
+config.vm.define :firewall do |firewall|
+firewall.vm.box = "bento/centos-7"
+firewall.vm.network :private_network, ip: "192.168.50.4"
+firewall.vm.network "public_network", use_dhcp_assigned_default_route:true
+firewall.vm.hostname = "firewall"
+end
+config.vm.define :dnstest do |dnstest|
+dnstest.vm.box = "bento/ubuntu-20.04"
+dnstest.vm.network :private_network, ip: "192.168.20.2"
+dnstest.vm.hostname = "dnstest"
+dnstest.vm.provision "shell", path: "script.sh"
+end
+end
